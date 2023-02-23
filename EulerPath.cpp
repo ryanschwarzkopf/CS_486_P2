@@ -13,12 +13,11 @@
 
 using namespace std;
 
-size_t source(const DiGraph & g)
 // Find a source node from g: the node has one more
 // outgoing edge than incoming edge. When such a node
 // does not exist, a value of the total number of nodes
 // is returned.
-{
+size_t source(const DiGraph & g) {
     size_t i;
     
     for (i=0; i<g.m_nodes.size(); ++i) {
@@ -30,12 +29,11 @@ size_t source(const DiGraph & g)
     return i;
 }
 
-size_t sink(const DiGraph & g)
 // Find a source node from g: the node has one more
 // outgoing edge than incoming edge. When such a node
 // does not exist, a value of the total number of nodes
 // is returned.
-{
+size_t sink(const DiGraph & g) {
     size_t i;
     for (i=0; i<g.m_nodes.size(); ++i) {
         if (g.m_nodes[i].m_outgoing.size() + 1
@@ -46,10 +44,8 @@ size_t sink(const DiGraph & g)
     return i;
 }
 
-
-list<size_t> find_Eulerian_cycle(DiGraph & g)
 // find an Eulerian cycle from graph g
-{
+list<size_t> find_Eulerian_cycle(DiGraph & g) {
     list <size_t> cycle; // main cycle
     
     // TO-DO: insert code to find Eulerian cycle represented
@@ -64,9 +60,8 @@ list<size_t> find_Eulerian_cycle(DiGraph & g)
     return cycle;
 }
 
-list<size_t> find_Eulerian_path(DiGraph & g)
 // find an Eulerian path from graph g, assuming g has such a path
-{
+list<size_t> find_Eulerian_path(DiGraph & g) {
     list <size_t> path, cycle;
     
     size_t src = source(g);    // find the source node
@@ -135,10 +130,9 @@ list<size_t> find_Eulerian_path(DiGraph & g)
     return path;
 }
 
-bool has_Eulerian_path(const DiGraph & g)
 // determine if graph g has an Eulerian path. This path could
 //   be a cycle in special cases.
-{
+bool has_Eulerian_path(const DiGraph & g) {
     bool exist = true;
     
     size_t numSources=0;

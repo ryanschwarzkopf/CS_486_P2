@@ -16,9 +16,8 @@
 
 using namespace std;
 
-struct DNAHasher
 // Hash function used for DNA sequence
-{
+struct DNAHasher {
     std::size_t operator()(const string & seq) const
     {
         // TO DO: Write a DNA sequence hash function here
@@ -30,9 +29,8 @@ struct DNAHasher
     }
 };
 
-struct AlphabetHasher
 // An example hash function used for the English alphabet
-{
+struct AlphabetHasher {
     std::size_t operator()(const string & seq) const
     {
         size_t val = 0;
@@ -50,12 +48,11 @@ struct AlphabetHasher
 
 typedef unordered_multimap<string, size_t, DNAHasher> CSeqHash;
 
-CSeqHash create_hash_table(const vector<string> & kmers)
 // create one hash table by inserting both the prefix and suffix of each
 //   k-mer. The prefix and suffix is the key. Associated with each element
 //   in the hash table is the node id for that prefix or suffix in the
 //   de Bruijn graph to be constructed.
-{
+CSeqHash create_hash_table(const vector<string> & kmers) {
     CSeqHash ht;
     size_t node_id=0; // the node id will be used in the de Bruijn graph
     for (auto i=0u; i<kmers.size(); ++i) {
@@ -69,9 +66,8 @@ CSeqHash create_hash_table(const vector<string> & kmers)
     return ht;
 }
 
-void create_deBruijn_graph_by_hashing(const vector<string> & kmers, DiGraph & g)
 // create a deBruijn graph by inserting all k-mers into the graph by hashing
-{
+void create_deBruijn_graph_by_hashing(const vector<string> & kmers, DiGraph & g) {
     // TO DO:
     
     // BEGIN your code below:

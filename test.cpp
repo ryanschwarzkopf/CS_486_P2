@@ -18,9 +18,7 @@
 
 using namespace std;
 
-void test_and_print_message(const string & seq, const string & seq_truth,
-                            size_t k, const string & message)
-{
+void test_and_print_message(const string & seq, const string & seq_truth, size_t k, const string & message) {
     if(seq == seq_truth) {
         cout << "Passed " << message <<
             " (assembled original sequence). Congratulations!" << endl;
@@ -32,8 +30,7 @@ void test_and_print_message(const string & seq, const string & seq_truth,
     }
 }
 
-static void test_1(const string & method)
-{
+static void test_1(const string & method) {
     cout << "Testing k-assembler by " << method << endl;
     
     // Testing sequences:
@@ -94,8 +91,7 @@ static void test_1(const string & method)
     }
 }
 
-static void test_2(const string & method)
-{
+static void test_2(const string & method) {
     string seq_truth = random_DNA_sequence();
     size_t k=10;
     
@@ -111,8 +107,7 @@ static void test_2(const string & method)
     }
 }
 
-void test_3(const string & method)
-{
+void test_3(const string & method) {
     string seq_truth = random_DNA_sequence(15, 15);
     size_t k=4;
 
@@ -134,8 +129,7 @@ void test_3(const string & method)
     }
 }
 
-void test_seq_assembly()
-{
+void test_seq_assembly() {
     vector<string> methods = {
         "k-mer pairwise comparison",
         "k-mer hashing"

@@ -9,9 +9,8 @@
 
 #include "k-assembler.hpp"
 
-void create_deBruijn_graph_by_string_comp(const vector<string> & kmers, DiGraph & g)
 // Insert all k mers into graph g by pair-wise sequence comparison
-{
+void create_deBruijn_graph_by_string_comp(const vector<string> & kmers, DiGraph & g) {
     list<Node> nodes;
     
     for (auto & kmer: kmers) { // for each kmer of size k

@@ -42,8 +42,7 @@ bool has_Eulerian_path(const DiGraph & g);
 
 string build_sequence(const list<size_t> & path, const DiGraph & g);
 
-string assemble_kmers(const vector<string> & kmers, const string & method,
-                      const string & dotfile="");
+string assemble_kmers(const vector<string> & kmers, const string & method, const string & dotfile="");
 
 void printDOTFile(const DiGraph & g, const string & file);
 

@@ -9,12 +9,9 @@
 #include "k-assembler.hpp"
 #include <fstream>
 
-
-string assemble_kmers(const vector<string> & kmers, const string & method,
-                      const string & dotfile)
 // assembler the given k-mers using the specified method and
 //   return the assembled sequence
-{
+string assemble_kmers(const vector<string> & kmers, const string & method, const string & dotfile) {
     string seq;
     
     DiGraph g;
@@ -45,9 +42,8 @@ string assemble_kmers(const vector<string> & kmers, const string & method,
     return seq;
 }
 
-string build_sequence(const list<size_t> & path, const DiGraph & g)
 // build a sequence by following a path in the input graph
-{
+string build_sequence(const list<size_t> & path, const DiGraph & g) {
     vector<Node> nodes = g.m_nodes;
     auto k = nodes[path.front()].m_label.size() + 1u;
     
@@ -72,8 +68,7 @@ string build_sequence(const list<size_t> & path, const DiGraph & g)
     return seq;
 }
 
-void printDOTFile(const DiGraph & g, const string & file)
-{
+void printDOTFile(const DiGraph & g, const string & file) {
     ofstream ofs(file);
     
     ofs << "digraph {" << endl;

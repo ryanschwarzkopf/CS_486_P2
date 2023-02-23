@@ -19,9 +19,8 @@
 
 using namespace std;
 
-string random_DNA_sequence(size_t min_length=10, size_t max_length=10000)
 // generate a DNA sequence of length in the given range
-{
+string random_DNA_sequence(size_t min_length=10, size_t max_length=10000) {
     string DNA;
     
     std::random_device rd;
@@ -43,10 +42,9 @@ string random_DNA_sequence(size_t min_length=10, size_t max_length=10000)
     return DNA;
 }
 
-vector<string> get_kmers(string seq, size_t k, bool randomized=true)
 // obtain all k-mers of a given sequence. The order of the k-mers
 //   is randomized by default.
-{
+vector<string> get_kmers(string seq, size_t k, bool randomized=true) {
     vector<string> kmers(seq.length() - k + 1);
     
     for (size_t i=0; i<kmers.size(); ++i) {
@@ -73,10 +71,9 @@ vector<string> get_kmers(string seq, size_t k, bool randomized=true)
     return kmers;
 }
 
-bool compare_composition(const string & s1, const string & s2, size_t k)
 // compare the canonical composition of two sequences. Canonical
 //   composition is all k-mers arranged in dictionary order.
-{
+bool compare_composition(const string & s1, const string & s2, size_t k) {
     bool same_composition = true;
     
     if (s1.length() != s2.length()) {
