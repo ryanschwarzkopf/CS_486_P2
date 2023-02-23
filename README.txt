@@ -1,6 +1,7 @@
 -------TODO-------
 
 deBruijnByHash.cpp---
+    (list here the tasks / problems)
 
 deBruijnByString.cpp---
 
