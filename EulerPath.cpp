@@ -10,11 +10,12 @@
 //
 
 #include "k-assembler.hpp"
+#include <stack>
 
 using namespace std;
 
 // Find a source node from g: the node has one more
-// outgoing edge than incoming edge. When such a node
+// incoming edge than outgoing edge. When such a node
 // does not exist, a value of the total number of nodes
 // is returned.
 size_t source(const DiGraph & g) {
@@ -54,7 +55,40 @@ list<size_t> find_Eulerian_cycle(DiGraph & g) {
     //   a graph with 5 nodes.
     
     // BEGIN your code here:
-        
+    
+    // check if graph is strongly connected (check every node for equal incoming and outgoing vertices)
+    // return empty cycle if not strongly connected.
+    if(!has_Eulerian_path(g)) return cycle;
+    cycle = find_Eulerian_cycle(g);
+    if(cycle.front() == cycle.back()) {
+        return cycle;
+    } else {
+        list<size_t> no_cycle;
+        return no_cycle;
+    }
+
+    /*
+    // to find eularian cycle, find all the simple cycles and combine into one.
+    // move through all nodes, removing edges that are used.
+    std::stack<Node> ST;
+    int i = 0;
+    ST.push(g.m_nodes[i]);
+    while(!ST.empty()) {
+        Node V = (Node)ST.top();
+        if(V.m_num_of_incoming ) {
+            cycle.push_back(i); // add V to answer
+            ST.pop(); // remove V from stack
+        } else {
+            V.m_outgoing;
+            // find outgoing edge match to incoming of another node.
+            // remove edge from outgoing
+            // put second end of this edge in ST
+        }
+        i++;
+    } // end while
+
+    */
+
     // END your code above
 
     return cycle;
