@@ -1,0 +1,200 @@
+---
+title: "Bioinformatics P2 Task1"
+author: "Cynthia Tovar"
+date: "2023-03-05"
+output: html_document
+---
+
+```{python}
+# StringReconstruction(Patterns)
+# # dB ← DeBruijn(Patterns)
+# # path ← EulerianPath(dB)
+# # Text ← PathToGenome(path)
+# # return Text
+#
+def string_reconstruction_problem(patterns):
+    return genome_path_problem(eulerian_path_problem(debrujin_graph_from_kmers(patterns)))
+
+
+def debrujin_graph_from_kmers(patterns):
+    kmers = []
+    for pattern in patterns:
+        kmers = kmers + suffix_composition(len(pattern), pattern, uniq=True)
+    kmers = set(kmers)
+    dict = {}
+    for kmer1 in kmers:
+        dict[kmer1] = []
+    for kmer in patterns:
+        dict[prefix(kmer)].append(suffix(kmer))
+    return dict
+
+
+def genome_path_problem(kmers, apppend_last=True):
+    genome = ''
+    kmer_length = len(kmers[0])
+    for kmer in kmers:
+        genome += kmer[0]
+    if apppend_last:
+        genome += kmer[1:]
+    return genome
+
+def eulerian_path_problem(dict):
+    stack=[]
+    balanced_count = get_balance_count(dict)
+    stack.append([k for k, v in balanced_count.items() if v==-1][0])
+    path = []
+    while stack != []:
+        u_v = stack[-1]
+        try:
+            w = dict[u_v][0]
+            stack.append(w)
+            dict[u_v].remove(w)
+        except:
+            path.append(stack.pop())
+    return path[::-1]
+
+
+def suffix_composition(k, text, uniq=False):
+    kmers = []
+    for i in range(len(text)+1-k):
+        kmers.append(text[i:i+k-1])
+    if uniq:
+        return sorted(list(kmers))
+    else:
+        return sorted(kmers)
+
+
+def get_balance_count(adj_list):
+    balanced_count = dict.fromkeys(adj_list.keys(), 0)
+    # Look for nodes balancing
+    for node in adj_list.keys():
+        for out in adj_list[node]:
+            balanced_count[node] -= 1
+            try:
+                balanced_count[out] += 1
+            except:
+                balanced_count[out] = 1
+    return balanced_count
+
+
+def suffix(string):
+    return string[1:]
+
+
+def prefix(string):
+    return string[0:-1]
+
+
+if __name__ == "__main__":
+    data = "".join(open('text1.txt')).split()
+    print(string_reconstruction_problem(data[1:]))
+
+```
+
+
+
+```{c}
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+// function declarations
+string string_reconstruction_problem(vector<string> &patterns);
+unordered_map<string, vector<string>> debrujin_graph_from_kmers(vector<string> &patterns);
+string genome_path_problem(vector<string> &kmers, bool append_last);
+vector<string> eulerian_path_problem(unordered_map<string, vector<string>> &dict);
+vector<string> suffix_composition(int k, string text, bool uniq);
+unordered_map<string, int> get_balance_count(unordered_map<string, vector<string>> &adj_list);
+string suffix(string str);
+string prefix(string str);
+
+// main function
+int main() {
+    // read input file
+    ifstream input_file("text1.txt");
+    int num_patterns;
+    input_file >> num_patterns;
+    vector<string> patterns(num_patterns);
+    for (int i = 0; i < num_patterns; i++) {
+        input_file >> patterns[i];
+    }
+    input_file.close();
+    // call function and print result
+    cout << string_reconstruction_problem(patterns) << endl;
+    return 0;
+}
+
+// function definitions
+string string_reconstruction_problem(vector<string> &patterns) {
+    auto db = debrujin_graph_from_kmers(patterns);
+    auto path = eulerian_path_problem(db);
+    return genome_path_problem(path, true);
+}
+
+unordered_map<string, vector<string>> debrujin_graph_from_kmers(vector<string> &patterns) {
+    unordered_map<string, vector<string>> db;
+    auto kmers = vector<string>();
+    for (auto pattern : patterns) {
+        auto suffixes = suffix_composition(pattern.length(), pattern, true);
+        kmers.insert(kmers.end(), suffixes.begin(), suffixes.end());
+    }
+    sort(kmers.begin(), kmers.end());
+    kmers.erase(unique(kmers.begin(), kmers.end()), kmers.end());
+    for (auto kmer : kmers) {
+        db[kmer] = vector<string>();
+    }
+    for (auto pattern : patterns) {
+        db[prefix(pattern)].push_back(suffix(pattern));
+    }
+    return db;
+}
+
+string genome_path_problem(vector<string> &kmers, bool append_last) {
+    string genome = kmers[0];
+    for (int i = 1; i < kmers.size(); i++) {
+        genome += kmers[i].back();
+    }
+    if (append_last) {
+        genome += kmers.back().back();
+    }
+    return genome;
+}
+
+vector<string> eulerian_path_problem(unordered_map<string, vector<string>> &dict) {
+    auto stack = vector<string>();
+    auto balanced_count = get_balance_count(dict);
+    for (auto const &p : balanced_count) {
+        if (p.second == -1) {
+            stack.push_back(p.first);
+            break;
+        }
+    }
+    auto path = vector<string>();
+    while (!stack.empty()) {
+        auto uv = stack.back();
+        try {
+            auto w = dict[uv].front();
+            stack.push_back(w);
+            dict[uv].erase(dict[uv].begin());
+        }
+        catch (...) {
+            path.push_back(uv);
+            stack.pop_back();
+        }
+    }
+    reverse(path.begin(), path.end());
+    return path;
+}
+
+vector<string> suffix_composition(int k, string text, bool uniq) {
+    auto kmers = vector<string>();
+    for (int i = 0; i <= text.length() - k; i++) {
+        kmers.push_back(text.substr(i, k - 1));
+    }
+    if (uniq)
+
+```
