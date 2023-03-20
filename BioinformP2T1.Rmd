@@ -85,6 +85,31 @@ def prefix(string):
     return string[0:-1]
 
 
+def random_sequence(min_length, max_length):
+    sequence = ""
+    length = random.randint(min_length, max_length)
+    for count in range(length):
+        sequence += choice("atcg")
+        return sequence
+
+def get_kmers(sequence, size, random):
+    for i in range(len(sequence)):
+        kmers.append(kmer[i:size])
+    if random == True:
+        return random.shuffle(kmers)
+    return kmers
+
+def compare_composition(s1, s2, size)
+    if len(s1) != len(s2):
+        return False
+    if s1 == s2
+        return True
+    composition1 = sort(get_kmers(s1, size, False))
+    composition2 = sort(get_kmers(s2, size, False))
+    if composition1 == composition2:
+        return True
+    return False
+
 if __name__ == "__main__":
     data = "".join(open('text1.txt')).split()
     print(string_reconstruction_problem(data[1:]))
