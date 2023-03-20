@@ -34,7 +34,7 @@ def genome_path_problem(kmers, apppend_last=True):
     kmer_length = len(kmers[0])
     for kmer in kmers:
         genome += kmer[0]
-    if apppend_last:
+    if append_last:
         genome += kmer[1:]
     return genome
 
@@ -110,7 +110,7 @@ def compare_composition(s1, s2, size)
         return True
     return False
 
-
+# this won't work now because we're using the random sequence generator
 if __name__ == "__main__":
     data = "".join(open('text1.txt')).split()
     print(string_reconstruction_problem(data[1:]))

@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 19 13:17:40 2023
+
+@author: cynthiavannesatovar
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+'''
+title: "Bioinformatics P2 Task1"
+author: "Cynthia Tovar"
+date: "2023-03-05"
+output: html_document
+'''
+
+# This Python code defines several functions to construct a genome sequence from 
+# a list of k-mers using a De Bruijn graph approach
+
+
+# importing dependencies **************************************************************
+from queue import Queue
+
+'''
+The main function is construct_sequence, which takes a list of k-mers
+as input and returns the reconstructed genome sequence. It does this by first
+constructing the De Bruijn graph from the k-mers using the function 
+debrujin_graph_from_kmers(patterns), and then finding the Eulerian path through
+the graph using the function eulPath(dict). Finally, the reconstructed genome
+sequence is obtained by concatenating the first k-1 characters of each k-mer in 
+the Eulerian path using the function genomePath(kmers).
+'''
+def construct_sequence():
+    return genomePath(eulPath(debrujin_graph_from_kmers(random_sequence)))
+
+'''
+The function debrujin_graph_from_kmers(patterns) constructs the De Bruijn graph
+by first generating all possible k-mers from the input list and then creating a 
+dictionary where each key is a k-mer and the corresponding value is a list of
+k-mers that overlap with the key by k-1 characters.
+'''
+def debrujin_graph_from_kmers(patterns):
+    kmers = []
+    for pattern in patterns:
+        kmers = kmers + suffix_composition(len(pattern), pattern, uniq=True)
+    kmers = set(kmers)
+    dict = {}
+    for kmer1 in kmers:
+        dict[kmer1] = []
+    for kmer in patterns:
+        dict[prefix(kmer)].append(suffix(kmer))
+    return dict
+
+
+def genomePath(kmers, append_last=True):
+    genome = ''
+   
+    for kmer in kmers:
+        genome += kmer[0]
+    if append_last:
+        genome += kmer[1:]
+    return genome
+'''
+The function eulPath(dict) takes a dictionary representation of the 
+De Bruijn graph as input and returns the Eulerian path through the graph as a 
+list of nodes. This is done by iteratively traversing the graph and adding nodes
+to a stack until a dead end is reached, at which point the last node is added 
+to the path and removed from the stack.
+'''
+def eulPath(dict):
+    # Initialize a queue
+    queue = Queue()
+    # Count the number of incoming and outgoing edges for each vertex
+    balanced_count = balanceCount(dict)
+    # Add the starting node to the queue
+    queue.put([k for k, v in balanced_count.items() if v==-1][0])
+    # Initialize an empty list to store the path
+    path = []
+    # While the queue is not empty
+    while not queue.empty():
+        # Get the vertex at the front of the queue
+        u_v = queue.get()
+        try:
+            # Get the first unexplored neighbor of the vertex
+            w = dict[u_v][0]
+            # Add the neighbor to the back of the queue
+            queue.put(w)
+            # Remove the edge from the graph
+            dict[u_v].remove(w)
+        except:
+            # If the vertex has no unexplored neighbors, add it to the path
+            path.append(u_v)
+    # Reverse the path and return it
+    return path[::-1]
+'''
+suffix_composition(k, text, uniq=False), which generates all k-length suffixes 
+of a given string
+'''
+
+def suffix_composition(k, text, uniq=False):
+    kmers = []
+    for i in range(len(text)+1-k):
+        kmers.append(text[i:i+k-1])
+    if uniq:
+        return sorted(list(kmers))
+    else:
+        return sorted(kmers)
+'''
+ balanceCount(adjacentList), which computes the in-degree and out-degree of
+ each node in the graph.
+'''
+
+def balanceCount(adjacentList):
+    balanced_count = dict.fromkeys(adjacentList.keys(), 0)
+    # Look for nodes balancing
+    for node in adjacentList.keys():
+        for out in adjacentList[node]:
+            balanced_count[node] -= 1
+            try:
+                balanced_count[out] += 1
+            except:
+                balanced_count[out] = 1
+    return balanced_count
+
+
+def suffix(string):
+    return string[1:]
+
+
+def prefix(string):
+    return string[0:-1]
+
+
+# Generate a random string of DNA of a random length between min_length and max_length
+def random_sequence(min_length, max_length):
+    sequence = ""
+    length = random.randint(min_length, max_length)
+    for count in range(length):
+        sequence += choice("atcg")
+        return sequence
+
+# turn a string into an array of kmers. May be random or not.
+def get_kmers(sequence, size, random):
+    for i in range(len(sequence)):
+        kmers.append(kmer[i:size])
+    if random == True:
+        return random.shuffle(kmers)
+    return kmers
+
+# compare compositions of two strings. (the strings may not be equal yet still have the same composition)
+def compare_composition(s1, s2, size)
+    if len(s1) != len(s2):
+        return False
+    if s1 == s2
+        return True
+    composition1 = sort(get_kmers(s1, size, False))
+    composition2 = sort(get_kmers(s2, size, False))
+    if composition1 == composition2:
+        return True
+    return False
+
+if __name__ == "__main__":
+    data = "".join(open('/Users/cynthiavannesatovar/Desktop/NMSU/spring2023/bioinformaticCourse/Project2/text1.txt')).split()
+    print(construct_sequence())
+
