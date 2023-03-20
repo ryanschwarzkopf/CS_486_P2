@@ -12,14 +12,14 @@ output: html_document
 # # Text ← PathToGenome(path)
 # # return Text
 #
-def string_reconstruction_problem(patterns):
-    return genome_path_problem(eulerian_path_problem(debrujin_graph_from_kmers(patterns)))
+def string_reconstruction_problem():
+    return genome_path_problem(eulerian_path_problem(debrujin_graph_from_kmers(random_sequence(10, 10000, True))))
 
 
-def debrujin_graph_from_kmers(patterns):
-    kmers = []
-    for pattern in patterns:
-        kmers = kmers + suffix_composition(len(pattern), pattern, uniq=True)
+def debrujin_graph_from_kmers(kmers):
+    # kmers = []
+    # for pattern in patterns:
+    #     kmers = kmers + suffix_composition(len(pattern), pattern, uniq=True)
     kmers = set(kmers)
     dict = {}
     for kmer1 in kmers:
@@ -109,6 +109,7 @@ def compare_composition(s1, s2, size)
     if composition1 == composition2:
         return True
     return False
+
 
 if __name__ == "__main__":
     data = "".join(open('text1.txt')).split()
