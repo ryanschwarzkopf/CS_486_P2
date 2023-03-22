@@ -10,6 +10,9 @@ from typing import List
 from typing import Tuple
 from collections import defaultdict
 
+def main():
+    test_seq_assembly();
+
 #########################################################################################################################################
 # test.cpp
 
@@ -356,3 +359,6 @@ def has_Eulerian_path(g: DiGraph):
     return exist
 
 ##########################################################################################
+
+if __name__ == "__main__":
+    main()
