@@ -34,8 +34,7 @@ def test_1(method):
         end = time.time()
         elapsed_secs = end - begin
         print(f"Elapsed time for building de Bruijn graph: {elapsed_secs}")
-        #if has_Eulerian_path(g):
-        if True:
+        if has_Eulerian_path(g):
             print("Passed test for existence of Eulerian path. Congratulations!")
         else:
             print("Failed test for existence of Eulerian path!")
@@ -93,8 +92,7 @@ def assemble_kmers(kmers, method):
         g = debrujin_graph_from_kmers(kmers)
     else:
         raise Exception("ERROR: unknown methods!")
-    #if not has_Eulerian_path(g):
-    if False:
+    if not has_Eulerian_path(g):
         raise Exception("ERROR: Eulerian path does not exist!")
     else:
         path = find_Eulerian_path(g)
@@ -188,7 +186,10 @@ def balanceCount(adjacentList):
             balanced_count[node] -= 1
             balanced_count[out] += 1
     return balanced_count
-'''
+
+def build_sequence(path):
+    return ''.join(path)
+
 def has_Eulerian_path(graph):
     # Check if the graph is strongly connected
     visited = set()
@@ -215,7 +216,7 @@ def dfs(node, graph, visited):
         visited.add(node)
         for neighbor in graph[node]:
             dfs(neighbor, graph, visited)
-'''
+
 
 if __name__ == "__main__":
     main()
