@@ -2,19 +2,26 @@ import random
 import time
 from typing import List
 from typing import Tuple
-from collections import defaultdict, deque
+from collections import defaultdict, deque, Counter
 
 def main():
-    seq_truth = "aaaaaaaaaaa"
-    kmers = get_kmers(seq_truth, 3, True)
-    g = debrujin_graph_from_kmers(kmers)
-    print('debruijn graph finished')
-    if has_Eulerian_path(g):
-        print('Has Eularian path')
-        path = find_Eulerian_path(g)
-    else:
-        print('does not have Eularian path')
-
+    seq_truths = ["aaaaaaaaaaa", "agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
+    for seq_truth in seq_truths:
+        kmers = get_kmers(seq_truth, 3, True)
+        print(kmers)
+        g = debrujin_graph_from_kmers(kmers)
+        print('      Debruijn graph finished')
+        print(g)
+        if has_Eulerian_path(g):
+            print('      Has Eularian path')
+            path = find_Eulerian_path(g)
+            print(path)
+            print('      Eularian path:', build_sequence(path))
+            print('      Composition:', compare_composition(seq_truth, build_sequence(path), 3))
+            print('\n')
+        else:
+            print('      does not have Eularian path')    
+            print('\n')
 
 def random_DNA_sequence(min_length=10, max_length=10000):
     DNA = ""
@@ -104,36 +111,50 @@ def balanceCount(adjacentList):
             balanced_count[out] += 1
     return balanced_count
 
+# by doing join(path) the path will have double of every nucleotide except for the last one.
 def build_sequence(path):
-    return ''.join(path)
+    seq1 = ''.join(path)
+    seq2 = ''
+    for i in range(0, len(seq1)):
+        if (i % 2) == 0:
+            seq2 += seq1[i]
+    seq2 += seq1[len(seq1)-1]
+    return seq2
 
 def has_Eulerian_path(graph):
-    # Check if the graph is strongly connected
+    # Calculate in-degree and out-degree for each vertex
+    in_degrees = defaultdict(int)
+    out_degrees = defaultdict(int)
+    for u, neighbors in graph.items():
+        for v in neighbors:
+            out_degrees[u] += 1
+            in_degrees[v] += 1
+    
+    # Check if the graph is connected
     visited = set()
-    start = list(graph.keys())[0]
-    dfs(start, graph, visited)
+    stack = deque(['ag'])
+    while stack:
+        vertex = stack.pop()
+        visited.add(vertex)
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                stack.append(neighbor)
     if len(visited) != len(graph):
         return False
-
-    # Count the in-degree and out-degree of each node
-    indegree = {node: 0 for node in graph}
-    outdegree = {node: 0 for node in graph}
-    for node, neighbors in graph.items():
-        outdegree[node] = len(neighbors)
-        for neighbor in neighbors:
-            indegree[neighbor] += 1
-
-    # Check if the graph has at most two nodes with odd degree
-    num_odd = sum(deg % 2 == 1 for node, deg in outdegree.items())
-    num_odd += sum(deg % 2 == 1 for node, deg in indegree.items())
-    return num_odd <= 2
-
-def dfs(node, graph, visited):
-    if node not in visited:
-        visited.add(node)
-        for neighbor in graph[node]:
-            dfs(neighbor, graph, visited)
-
+    
+    # Count the number of vertices with odd degree
+    odd_degree_count = 0
+    for vertex in graph:
+        if out_degrees[vertex] - in_degrees[vertex] == 1:
+            odd_degree_count += 1
+        elif in_degrees[vertex] - out_degrees[vertex] == 1:
+            odd_degree_count += 1
+            start_vertex = vertex
+        elif abs(out_degrees[vertex] - in_degrees[vertex]) > 1:
+            return False
+    
+    # If the count is 0 or 2, then the graph has an Eulerian path
+    return odd_degree_count == 0 or odd_degree_count == 2
 
 if __name__ == "__main__":
     main()
