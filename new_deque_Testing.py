@@ -154,7 +154,7 @@ def balanceCount(adjacentList):
     balanced_count = dict.fromkeys(all_nodes, 0)
     
     if len(all_nodes) == 1:
-        print("Single Node Exception")
+        #print("Single Node Exception")
         for node in all_nodes:
             balanced_count[node] = -1
         return balanced_count

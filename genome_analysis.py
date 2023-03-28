@@ -47,7 +47,11 @@ def test_1(method):
             print("Failed test for existence of Eulerian path!")
             continue
         try:
+            begin = time.time()
             path = eulPath(g,balanced_count)
+            end = time.time()
+            elapsed_secs = end - begin
+            print(f"Elapsed time for building Eulerian path: {elapsed_secs}")
             seq = genomePath(path)
             message = f"Test 1 Example {i}"
             test_and_print_message(seq, curr, k, message)
