@@ -5,11 +5,13 @@ from typing import Tuple
 from collections import defaultdict, deque, Counter
 
 def main():
-    seq_truths = ["aaaaaaaaaaa", "agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
+    seq_truths = ["agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
+    #["aaaaaaaaaaa", "agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
+    print(seq_truths)
     for seq_truth in seq_truths:
         kmers = get_kmers(seq_truth, 3, True)
         print(kmers)
-        g = debrujin_graph_from_kmers(kmers)
+        g = debrujin_graph_from_kmers(kmers[1:])
         print('      Debruijn graph finished')
         print(g)
         if has_Eulerian_path(g):
@@ -33,12 +35,15 @@ def random_DNA_sequence(min_length=10, max_length=10000):
 
 def get_kmers(seq, k, randomized=True):
     kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
+    #print(kmers)
     if randomized:
         nkmers = len(kmers)
         for i in range(nkmers-1):
             j = random.randint(i, len(kmers)-1)
             kmers[i], kmers[j] = kmers[j], kmers[i]
-    return kmers
+    result = [k]
+    result.extend(kmers)
+    return result
 
 def compare_composition(s1, s2, k):
     same_composition = True
@@ -57,7 +62,7 @@ def compare_composition(s1, s2, k):
 def debrujin_graph_from_kmers(patterns):
     kmers = set()
     for pattern in patterns:
-        kmers = set(suffix_composition(len(pattern), pattern))
+        kmers |= set(suffix_composition(len(pattern), pattern))
     graph = defaultdict(deque)
     for kmer in patterns:
         graph[prefix(kmer)].append(suffix(kmer))
@@ -132,7 +137,7 @@ def has_Eulerian_path(graph):
     
     # Check if the graph is connected
     visited = set()
-    stack = deque(['ag'])
+    stack = deque()
     while stack:
         vertex = stack.pop()
         visited.add(vertex)

@@ -21,9 +21,10 @@ def test_1(method):
     ks = [5, 3, 3, 20]
     for i in range(len(seqs_truth)):     
         print(f"\nExample {i}:")
-        seq_truth = seqs_truth[i]
+        curr = seqs_truth[i]
+        #print(curr)
         k = ks[i]
-        kmers = get_kmers(seq_truth, k, True)
+        kmers = get_kmers(curr, k, True)
         begin = time.time()
         if method == "k-mer pairwise comparison":
             g = create_deBruijn_graph_by_string_comp(kmers)
@@ -34,16 +35,20 @@ def test_1(method):
         end = time.time()
         elapsed_secs = end - begin
         print(f"Elapsed time for building de Bruijn graph: {elapsed_secs}")
-        if has_Eulerian_path(g):
+        balanced_count = balanceCount(g)
+        #print("BALANCED COUNT")
+        #print(balanced_count)
+        path = deque()
+        if has_Eulerian_path(balanced_count):
             print("Passed test for existence of Eulerian path. Congratulations!")
         else:
             print("Failed test for existence of Eulerian path!")
-            return 0
+            continue
         try:
-            path = eulPath(g)
-            seq = build_sequence(path)
+            path = eulPath(g,balanced_count)
+            seq = genomePath(path)
             message = f"Test 1 Example {i}"
-            test_and_print_message(seq, seq_truth, k, message)
+            test_and_print_message(seq, curr, k, message)
         except Exception as e:
             print(f"ERROR: {e}")
 
@@ -93,11 +98,13 @@ def assemble_kmers(kmers, method):
         g = debrujin_graph_from_kmers(kmers)
     else:
         raise Exception("ERROR: unknown methods!")
-    if not has_Eulerian_path(g):
+    balanced_count = balanceCount(g)
+    #path = deque()
+    if not has_Eulerian_path(balanced_count):
         raise Exception("ERROR: Eulerian path does not exist!")
     else:
-        path = eulPath(g)
-        seq = build_sequence(path)
+        path = eulPath(g,balanced_count)
+        seq = genomePath(path)
     return seq
 
 def random_DNA_sequence(min_length=10, max_length=10000):
@@ -156,7 +163,7 @@ def create_deBruijn_graph_by_string_comp(kmers):
         suffix = kmer[1:]
         # if prefix isn't in the graph add it and add the suffix, else add the suffix to the right prefix
         if prefix not in graph:
-            graph[prefix] = []
+            graph[prefix] = deque()
         graph[prefix].append(suffix)
     return graph
 
@@ -172,28 +179,28 @@ def suffix(string):
 def prefix(string):
     return string[:-1]
 
-def find_Eulerian_path(graph):
-    stack = deque()
-    balanced_count = balanceCount(graph)
-    stack.appendleft([k for k, v in balanced_count.items() if v == -1][0])
-    path = deque()
-    while stack:
-        u_v = stack[0]
-        try:
-            w = graph[u_v][0]
-            stack.appendleft(w)
-            graph[u_v].popleft()
-        except:
-            path.appendleft(stack.popleft())
-    return path
-
 def balanceCount(adjacentList):
-    balanced_count = defaultdict(int)
-    # Look for nodes balancing
+    # create a set of all nodes in the graph
+    all_nodes = set(adjacentList.keys())
+    #print(all_nodes)
+    #print(adjacentList)
+    for nodes in adjacentList.values():
+        all_nodes.update(nodes)
+
+    # create a dictionary to hold the balanced counts
+    balanced_count = dict.fromkeys(all_nodes, 0)
+
+    # iterate over each node in the adjacency list
     for node in adjacentList.keys():
+        # subtract the out-degree of the node from its balanced count
+        balanced_count[node] -= len(adjacentList[node])
+        # iterate over each outgoing edge from the node
         for out in adjacentList[node]:
-            balanced_count[node] -= 1
-            balanced_count[out] += 1
+            # add 1 to the balanced count of the node at the other end of the edge
+            try:
+                balanced_count[out] += 1
+            except KeyError:
+                balanced_count[out] = 1
     return balanced_count
 
 def build_sequence(path):
@@ -205,55 +212,27 @@ def build_sequence(path):
     seq2 += seq1[len(seq1)-1]
     return seq2
 
-def eulPath(graph):
-    stack = deque()
-    balanced_count = balanceCount(graph)
-    stack.appendleft([k for k, v in balanced_count.items() if v == -1][0])
+def eulPath(graph, balanced_count):
+    dictionary = deque()
+    #print("BALANCED COUNT ITEMS")
+    #print(balanced_count.items())
+    dictionary.appendleft([k for k, v in balanced_count.items() if v == -1][0])
     path = deque()
-    while stack:
-        u_v = stack[0]
+    while dictionary:
+        u_v = dictionary[0]
         try:
             w = graph[u_v][0]
-            stack.appendleft(w)
+            dictionary.appendleft(w)
             graph[u_v].popleft()
         except:
-            path.appendleft(stack.popleft())
+            path.appendleft(dictionary.popleft())
     return path
 
-def has_Eulerian_path(graph):
-    # Calculate in-degree and out-degree for each vertex
-    in_degrees = defaultdict(int)
-    out_degrees = defaultdict(int)
-    for u, neighbors in graph.items():
-        for v in neighbors:
-            out_degrees[u] += 1
-            in_degrees[v] += 1
-    
-    # Check if the graph is connected
-    visited = set()
-    stack = deque(['ag'])
-    while stack:
-        vertex = stack.pop()
-        visited.add(vertex)
-        for neighbor in graph[vertex]:
-            if neighbor not in visited:
-                stack.append(neighbor)
-    if len(visited) != len(graph):
-        return False
-    
-    # Count the number of vertices with odd degree
-    odd_degree_count = 0
-    for vertex in graph:
-        if out_degrees[vertex] - in_degrees[vertex] == 1:
-            odd_degree_count += 1
-        elif in_degrees[vertex] - out_degrees[vertex] == 1:
-            odd_degree_count += 1
-            start_vertex = vertex
-        elif abs(out_degrees[vertex] - in_degrees[vertex]) > 1:
-            return False
-    
-    # If the count is 0 or 2, then the graph has an Eulerian path
-    return odd_degree_count == 0 or odd_degree_count == 2
+def has_Eulerian_path(balanced_count):
+    for k, v in balanced_count.items():
+        if v == -1:
+            return True
+    return False    
 
 
 if __name__ == "__main__":

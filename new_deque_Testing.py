@@ -11,7 +11,7 @@ Created on Mon Mar 20 13:01:56 2023
 
 
 # importing dependencies ******************************************************
-
+import random
 from collections import defaultdict, deque
 
 '''
@@ -37,7 +37,16 @@ the Eulerian path using the function genomePath(kmers).
 '''
 
 def construct_sequence(patterns):
-    return genomePath(eulPath(debrujin_graph_from_kmers(patterns)))
+    graph = debrujin_graph_from_kmers(patterns)
+    balanced_count = balanceCount(graph)
+    path = deque()
+    if has_Eulerian_path(balanced_count):
+        path = eulPath(graph,balanced_count)
+        print("Eulerian Path Exists")
+    else:
+        return("No Eulerian Path Exists")        
+    genome = genomePath(path)
+    return genome
 
 '''
 The function debrujin_graph_from_kmers(patterns) constructs the De Bruijn graph
@@ -101,19 +110,20 @@ a deque as a queue. Replace path.append() with path.appendleft() to add
  return path[::-1], as we will be using a deque to store the final path.
 '''
 
-def eulPath(graph):
-    stack = deque()
-    balanced_count = balanceCount(graph)
-    stack.appendleft([k for k, v in balanced_count.items() if v == -1][0])
+def eulPath(graph, balanced_count):
+    dictionary = deque()
+    #print("BALANCED COUNT ITEMS")
+    #print(balanced_count.items())
+    dictionary.appendleft([k for k, v in balanced_count.items() if v == -1][0])
     path = deque()
-    while stack:
-        u_v = stack[0]
+    while dictionary:
+        u_v = dictionary[0]
         try:
             w = graph[u_v][0]
-            stack.appendleft(w)
+            dictionary.appendleft(w)
             graph[u_v].popleft()
         except:
-            path.appendleft(stack.popleft())
+            path.appendleft(dictionary.popleft())
     return path
 
 '''
@@ -132,13 +142,29 @@ def suffix_composition(k, text):
 '''
 
 def balanceCount(adjacentList):
-    balanced_count = defaultdict(int)
-    # Look for nodes balancing
+    # create a set of all nodes in the graph
+    all_nodes = set(adjacentList.keys())
+    #print(all_nodes)
+    #print(adjacentList)
+    for nodes in adjacentList.values():
+        all_nodes.update(nodes)
+
+    # create a dictionary to hold the balanced counts
+    balanced_count = dict.fromkeys(all_nodes, 0)
+
+    # iterate over each node in the adjacency list
     for node in adjacentList.keys():
+        # subtract the out-degree of the node from its balanced count
+        balanced_count[node] -= len(adjacentList[node])
+        # iterate over each outgoing edge from the node
         for out in adjacentList[node]:
-            balanced_count[node] -= 1
-            balanced_count[out] += 1
+            # add 1 to the balanced count of the node at the other end of the edge
+            try:
+                balanced_count[out] += 1
+            except KeyError:
+                balanced_count[out] = 1
     return balanced_count
+    
 
 def suffix(string):
     return string[1:]
@@ -146,14 +172,42 @@ def suffix(string):
 def prefix(string):
     return string[:-1]
     
+def get_kmers(seq, k, randomized=True):
+    kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
+    #print(kmers)
+    if randomized:
+        nkmers = len(kmers)
+        for i in range(nkmers-1):
+            j = random.randint(i, len(kmers)-1)
+            kmers[i], kmers[j] = kmers[j], kmers[i]
+    return kmers
+    
+def random_DNA_sequence(min_length=10, max_length=10000):
+    DNA = ""
+    length = random.randint(min_length, max_length)
+    nucleotides = "atgc"
+    for n in range(length):
+        DNA += nucleotides[random.randint(0, 3)]
+    return DNA
+    
+def has_Eulerian_path(balanced_count):
+    for k, v in balanced_count.items():
+        if v == -1:
+            return True
+    return False    
+    
 def main():
-    seq_truths = ["aaaaaaaaaaa", "agcagctcagc", "agcagctcag"]#, random_DNA_sequence(11, 15)]
+    seq_truths = ["aaaaaaaaaaa", "agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
+    
     for i in seq_truths:
         print(i)
-        data = "".join(i).split()
-        print(construct_sequence(i))
+        kmers = get_kmers(i,3,True)
+        print(kmers)
+        print(construct_sequence(kmers))
 
 if __name__ == "__main__":
     main()
     #data = "".join(open('./text1.txt')).split()
+    #print(data)
+    #print(data[1:])
     #print(construct_sequence(data[1:]))

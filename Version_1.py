@@ -90,9 +90,7 @@ def suffix_composition(k, text, uniq=False):
  each node in the graph.
 '''
 
-def balanceCount(adjacentList):
-    if not adjacentList:# to account for single nodes
-        return {}
+def balanceCount(adjacentList): # is the graph
     balanced_count = dict.fromkeys(adjacentList.keys(), 0)
     # Look for nodes balancing
     for node in adjacentList.keys():
