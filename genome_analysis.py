@@ -206,6 +206,12 @@ def balanceCount(adjacentList):
 
     # create a dictionary to hold the balanced counts
     balanced_count = dict.fromkeys(all_nodes, 0)
+    
+    if len(all_nodes) == 1:
+        #print("Single Node Exception")
+        for node in all_nodes:
+            balanced_count[node] = -1
+        return balanced_count
 
     # iterate over each node in the adjacency list
     for node in adjacentList.keys():
@@ -219,15 +225,6 @@ def balanceCount(adjacentList):
             except KeyError:
                 balanced_count[out] = 1
     return balanced_count
-
-def build_sequence(path):
-    seq1 = ''.join(path)
-    seq2 = ''
-    for i in range(0, len(seq1)):
-        if (i % 2) == 0:
-            seq2 += seq1[i]
-    seq2 += seq1[len(seq1)-1]
-    return seq2
 
 def eulPath(graph, balanced_count):
     dictionary = deque()
