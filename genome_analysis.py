@@ -27,7 +27,7 @@ def test_1(method):
         kmers = get_kmers(curr, k, True)
         begin = time.time()
         if method == "k-mer pairwise comparison":
-            create_deBruijn_graph_by_string_comp(kmers)
+            g = create_deBruijn_graph_by_string_comp(kmers)
         elif method == "k-mer hashing":
             g = debrujin_graph_from_kmers(kmers)
         elif method == "k-mer hashing without deque":
@@ -37,37 +37,36 @@ def test_1(method):
         end = time.time()
         elapsed_secs = end - begin
         print(f"Elapsed time for building de Bruijn graph: {elapsed_secs}")
-        
-        # Euler Path was not implemented for the data structure given by the pairwise method
-        if(method != "k-mer pairwise comparison"):
-            balanced_count = balanceCount(g)
-            #print("BALANCED COUNT")
-            #print(balanced_count)
-            path = deque()
-            if has_Eulerian_path(balanced_count):
-                print("Passed test for existence of Eulerian path. Congratulations!")
-            else:
-                print("Failed test for existence of Eulerian path!")
-                continue
-            try:
-                path = eulPath(g,balanced_count)
-                seq = genomePath(path)
-                message = f"Test 1 Example {i}"
-                test_and_print_message(seq, curr, k, message)
-            except Exception as e:
-                print(f"ERROR: {e}")
+        balanced_count = balanceCount(g)
+        #print("BALANCED COUNT")
+        #print(balanced_count)
+        path = deque()
+        if has_Eulerian_path(balanced_count):
+            print("Passed test for existence of Eulerian path. Congratulations!")
+        else:
+            print("Failed test for existence of Eulerian path!")
+            continue
+        try:
+            begin = time.time()
+            path = eulPath(g,balanced_count)
+            end = time.time()
+            elapsed_secs = end - begin
+            print(f"Elapsed time for building Eulerian path: {elapsed_secs}")
+            seq = genomePath(path)
+            message = f"Test 1 Example {i}"
+            test_and_print_message(seq, curr, k, message)
+        except Exception as e:
+            print(f"ERROR: {e}")
 
 def test_2(method):
     seq_truth = random_DNA_sequence()
     k = 10
     kmers = get_kmers(seq_truth, k)
-    # Euler Path was not implemented for the data structure given by the pairwise method
-    if(method != "k-mer pairwise comparison"):
-        try:
-            seq = assemble_kmers(kmers, method)
-            test_and_print_message(seq, seq_truth, k, "Test 2")
-        except Exception as e:
-            print(e)
+    try:
+        seq = assemble_kmers(kmers, method)
+        test_and_print_message(seq, seq_truth, k, "Test 2")
+    except Exception as e:
+        print(e)
 
 def test_3(method):
     seq_truth = random_DNA_sequence(15, 15)
@@ -177,27 +176,17 @@ def debrujin_graph_from_kmers_nondeque(patterns):
         dict[prefix(kmer)].append(suffix(kmer))
     return dict
 
-class Node:
-    def __init__(self, label: str):
-        self.m_label = label
-        self.m_num_of_incoming = 0
-        self.m_outgoing = []
-
 def create_deBruijn_graph_by_string_comp(kmers):
-    nodes = []
-    nodesFound = []S
-    i = 0
-    for kmerNode in kmers:
-        nodesFound.append(kmerNode)
-        nodes.append(Node(kmerNode))
-        for kmerCompare in kmers:
-            if len(kmerNode) > 1 and len(kmerCompare) > 1:
-                if kmerNode[:-1] == kmerCompare[1:]:
-                    nodes[i].m_num_of_incoming += 1
-                if kmerNode[1:] == kmerCompare[:-1]:
-                    nodes[i].m_outgoing.append(kmerCompare)
-        i += 1
-    return nodes
+    graph = {}
+    for kmer in kmers:
+        # make the prefix and suffix
+        prefix = kmer[:-1]
+        suffix = kmer[1:]
+        # if prefix isn't in the graph add it and add the suffix, else add the suffix to the right prefix
+        if prefix not in graph:
+            graph[prefix] = deque()
+        graph[prefix].append(suffix)
+    return graph
 
 def suffix_composition(k, text):
     kmers = []
