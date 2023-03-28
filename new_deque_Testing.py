@@ -145,7 +145,15 @@ def suffix(string):
 
 def prefix(string):
     return string[:-1]
+    
+def main():
+    seq_truths = ["aaaaaaaaaaa", "agcagctcagc", "agcagctcag"]#, random_DNA_sequence(11, 15)]
+    for i in seq_truths:
+        print(i)
+        data = "".join(i).split()
+        print(construct_sequence(i))
 
 if __name__ == "__main__":
-    data = "".join(open('./text1.txt')).split()
-    print(construct_sequence(data[1:]))
+    main()
+    #data = "".join(open('./text1.txt')).split()
+    #print(construct_sequence(data[1:]))
