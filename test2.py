@@ -7,7 +7,11 @@ from collections import defaultdict, deque, Counter
 def main():
     seq_truths = ["agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
     #["aaaaaaaaaaa", "agcagctcagc", "agcagctcag", random_DNA_sequence(11, 15)]
-    print(seq_truths)
+    kmers = get_kmers("agcagctcagc", 3, True)
+    print(kmers)
+    t_graph = create_deBruijn_graph_by_string_comp(kmers)
+    print(t_graph)
+    '''
     for seq_truth in seq_truths:
         kmers = get_kmers(seq_truth, 3, True)
         print(kmers)
@@ -24,6 +28,7 @@ def main():
         else:
             print('      does not have Eularian path')    
             print('\n')
+        '''
 
 def random_DNA_sequence(min_length=10, max_length=10000):
     DNA = ""
@@ -35,15 +40,12 @@ def random_DNA_sequence(min_length=10, max_length=10000):
 
 def get_kmers(seq, k, randomized=True):
     kmers = [seq[i:i+k] for i in range(len(seq) - k + 1)]
-    #print(kmers)
     if randomized:
         nkmers = len(kmers)
         for i in range(nkmers-1):
             j = random.randint(i, len(kmers)-1)
             kmers[i], kmers[j] = kmers[j], kmers[i]
-    result = [k]
-    result.extend(kmers)
-    return result
+    return kmers
 
 def compare_composition(s1, s2, k):
     same_composition = True
@@ -68,17 +70,29 @@ def debrujin_graph_from_kmers(patterns):
         graph[prefix(kmer)].append(suffix(kmer))
     return graph
 
+class Node:
+    def __init__(self, label: str):
+        self.m_label = label
+        self.m_num_of_incoming = 0
+        self.m_outgoing = []
+
 def create_deBruijn_graph_by_string_comp(kmers):
-    graph = {}
-    for kmer in kmers:
-        # make the prefix and suffix
-        prefix = kmer[:-1]
-        suffix = kmer[1:]
-        # if prefix isn't in the graph add it and add the suffix, else add the suffix to the right prefix
-        if prefix not in graph:
-            graph[prefix] = []
-        graph[prefix].append(suffix)
-    return graph
+    nodes = []
+    nodesFound = []
+    i = 0
+    for kmerNode in kmers:
+        nodesFound.append(kmerNode)
+        nodes.append(Node(kmerNode))
+        print(nodesFound)
+        print(nodes)
+        for kmerCompare in kmers:
+            if len(kmerNode) > 1 and len(kmerCompare) > 1:
+                if kmerNode[:-1] == kmerCompare[1:]:
+                    nodes[i].m_num_of_incoming += 1
+                if kmerNode[1:] == kmerCompare[:-1]:
+                    nodes[i].m_outgoing.append(kmerCompare)
+        i += 1
+    return nodes
 
 def suffix_composition(k, text):
     kmers = []
