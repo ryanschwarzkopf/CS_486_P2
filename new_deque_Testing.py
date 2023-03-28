@@ -146,14 +146,21 @@ def balanceCount(adjacentList):
     all_nodes = set(adjacentList.keys())
     #print(all_nodes)
     #print(adjacentList)
+    
     for nodes in adjacentList.values():
         all_nodes.update(nodes)
 
     # create a dictionary to hold the balanced counts
     balanced_count = dict.fromkeys(all_nodes, 0)
+    
+    if len(all_nodes) == 1:
+        #print("Single Node Exception")
+        for node in all_nodes:
+            balanced_count[node] = -1
+        return balanced_count
 
     # iterate over each node in the adjacency list
-    for node in adjacentList.keys():
+    for node in all_nodes:
         # subtract the out-degree of the node from its balanced count
         balanced_count[node] -= len(adjacentList[node])
         # iterate over each outgoing edge from the node
